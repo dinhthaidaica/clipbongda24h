@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">PingBall</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="video_loading">Loading video, please wait... </string>
+    <string name="data_loading">Loading data... </string>
+
+
+    <string name="replay">Replay</string>
+    <string name="fulltime"> Full time</string>
+    <string name="press_more_to_close">press back button one more time to close application</string>
+
+
+    <string name="ads_id">ca-app-pub-3097172335432618/6459868280</string>
+</resources>
