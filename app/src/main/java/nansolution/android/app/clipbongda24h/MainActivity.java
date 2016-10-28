@@ -230,7 +230,9 @@ public class MainActivity extends AppCompatActivity implements RewardedVideoAdLi
             requestPortraitMode();
             super.onBackPressed();
         } else {
-            if (isWaitingForClose) {
+            if (floatingSearchView.getVisibility() == View.VISIBLE) {
+                floatingSearchView.setVisibility(View.GONE);
+            } else if (isWaitingForClose) {
                 super.onBackPressed();
             } else {
                 isWaitingForClose = true;

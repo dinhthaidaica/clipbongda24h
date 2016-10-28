@@ -50,8 +50,6 @@ public class AllLeaguesFragment extends Fragment {
         resources.add(R.drawable.icon_league1);
         resources.add(R.drawable.icon_worldcup);
         resources.add(R.drawable.icon_others);
-        resources.add(R.drawable.icon_others);
-        resources.add(R.drawable.icon_others);
     }
 
     public static AllLeaguesFragment newInstance(String param1, String param2) {

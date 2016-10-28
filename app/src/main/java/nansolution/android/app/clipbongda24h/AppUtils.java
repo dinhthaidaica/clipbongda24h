@@ -34,8 +34,6 @@ public class AppUtils {
         list.add(new League("PR", "League One"));
         list.add(new League("WC", "World Cup"));
         list.add(new League("OTHER", "Other Leagues"));
-        list.add(new League("OTHER", "Other Leagues"));
-        list.add(new League("OTHER", "Other Leagues"));
 
         return list;
     }

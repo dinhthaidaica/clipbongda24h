@@ -64,7 +64,6 @@ public class MatchDetailsFragment extends Fragment implements View.OnClickListen
         @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
         @Override
         public void onTick(long l) {
-            Log.d("THAIPD", "Till " + l);
             try {
                 if (isOn) {
                     if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
