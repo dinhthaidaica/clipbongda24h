@@ -31,24 +31,35 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
+    // for ads
+    compile group: 'com.nineoldandroids', name: 'library', version: '2.4.0'
+
+    // floating search view
     compile 'com.github.arimorty:floatingsearchview:2.0.3'
 
-    compile 'com.google.gms:google-services:3.0.0'
-    compile 'com.android.support:appcompat-v7:24.2.1'
+//    compile 'com.google.gms:google-services:3.0.0'
+//    compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
-    compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.google.code.gson:gson:2.4'
-    compile 'com.daimajia.swipelayout:library:1.2.0@aar'
+
+    // Picasso for image loader
+    compile 'com.squareup.picasso:picasso:2.5.2'
+
+    // google support libs
     compile 'com.android.support:cardview-v7:24.2.1'
     compile 'com.android.support:design:24.2.1'
     compile 'com.android.support:support-v4:24.2.1'
-    compile 'com.github.devlight.navigationtabbar:navigationtabbar:1.2.5'
-    compile 'hanks.xyz:htextview-library:0.1.5'
 
+    // navigation tab bar
+    compile 'com.github.devlight.navigationtabbar:navigationtabbar:1.2.5'
+
+    // awesome textview
+    compile 'hanks.xyz:htextview-library:0.1.5'
 
     compile 'com.google.firebase:firebase-ads:9.6.1'
     testCompile 'junit:junit:4.12'
 }
+
 
 

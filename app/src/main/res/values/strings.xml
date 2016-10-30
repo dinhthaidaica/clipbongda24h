@@ -13,4 +13,8 @@
 
 
     <string name="ads_id">ca-app-pub-3097172335432618/6459868280</string>
+
+    <string name="title_activity_match_detail">MatchDetailActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>
