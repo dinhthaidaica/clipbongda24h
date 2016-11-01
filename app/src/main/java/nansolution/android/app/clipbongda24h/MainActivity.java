@@ -6,7 +6,6 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -14,11 +13,9 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.arlib.floatingsearchview.FloatingSearchView;
 import com.vungle.publisher.EventListener;
 import com.vungle.publisher.VunglePub;
 
@@ -29,10 +26,9 @@ import nansolution.android.app.clipbongda24h.interfaces.ClipBongDaApis;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-public class MainActivity extends AppCompatActivity /*implements AppBarLayout.OnOffsetChangedListener */{
+public class MainActivity extends AppCompatActivity {
 
     final String BASE_URL = "http://123.30.132.164:7070/";
     Retrofit retrofit;
@@ -50,10 +46,6 @@ public class MainActivity extends AppCompatActivity /*implements AppBarLayout.On
 
     private TextView txtTitle;
 
-//    private ImageView ivSearch;
-//    private FloatingSearchView floatingSearchView;
-//    private AppBarLayout mAppBar;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,35 +53,9 @@ public class MainActivity extends AppCompatActivity /*implements AppBarLayout.On
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         txtTitle = (TextView) findViewById(R.id.txt_title);
         toolbar.setVisibility(VISIBLE);
-        /*ivSearch = (ImageView) findViewById(R.id.iv_search);
-        floatingSearchView = (FloatingSearchView) findViewById(R.id.floating_search_view);*/
-//        floatingSearchView.setVisibility(GONE);
-
-        /*mAppBar = (AppBarLayout) findViewById(R.id.appbar);
-
-        mAppBar.addOnOffsetChangedListener(this);*/
-
-        /*ivSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ivSearch.setVisibility(View.GONE);
-                floatingSearchView.setVisibility(View.VISIBLE);
-                floatingSearchView.requestFocus();
-                showInputMethod(floatingSearchView);
-
-            }
-        });*/
-
-        /*floatingSearchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
-            @Override
-            public void onSearchTextChanged(String oldQuery, String newQuery) {
-
-            }
-        });*/
 
         setSupportActionBar(toolbar);
         setTextTitle(getString(R.string.app_name));
-//        getSupportActionBar().setHideOnContentScrollEnabled(true);
 
         // build retrofit object
         retrofit = new Retrofit.Builder()
@@ -161,14 +127,14 @@ public class MainActivity extends AppCompatActivity /*implements AppBarLayout.On
     }
 
     public void openMatchFragment(String matchId) {
-            MatchDetailsFragment fragment = MatchDetailsFragment.newInstance(matchId);
-            adsListener = fragment;
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.add(R.id.fragmentContainer, fragment);
-            ft.hide(mainFragment);
-            ft.addToBackStack(matchId);
-            ft.commit();
-            requestLandscapeMode();
+        MatchDetailsFragment fragment = MatchDetailsFragment.newInstance(matchId);
+        adsListener = fragment;
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.add(R.id.fragmentContainer, fragment);
+        ft.hide(mainFragment);
+        ft.addToBackStack(matchId);
+        ft.commit();
+        requestLandscapeMode();
     }
 
     @Override
@@ -243,9 +209,7 @@ public class MainActivity extends AppCompatActivity /*implements AppBarLayout.On
             requestPortraitMode();
             super.onBackPressed();
         } else {
-            /*if (floatingSearchView.getVisibility() == View.VISIBLE) {
-                floatingSearchView.setVisibility(GONE);
-            } else*/ if (isWaitingForClose) {
+            if (isWaitingForClose) {
                 super.onBackPressed();
             } else {
                 isWaitingForClose = true;
@@ -262,13 +226,7 @@ public class MainActivity extends AppCompatActivity /*implements AppBarLayout.On
                 }.start();
             }
         }
-
     }
-
-    /*@Override
-    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-//        toolbar.setTranslationY(verticalOffset);
-    }*/
 
     @Override
     protected void onPause() {

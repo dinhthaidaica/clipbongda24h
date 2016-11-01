@@ -13,8 +13,8 @@ android {
         applicationId "nansolution.android.app.clipbongda24h"
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -27,18 +27,9 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
-
     // for ads
     compile group: 'com.nineoldandroids', name: 'library', version: '2.4.0'
 
-    // floating search view
-    compile 'com.github.arimorty:floatingsearchview:2.0.3'
-
-//    compile 'com.google.gms:google-services:3.0.0'
-//    compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
     compile 'com.google.code.gson:gson:2.4'
@@ -56,9 +47,6 @@ dependencies {
 
     // awesome textview
     compile 'hanks.xyz:htextview-library:0.1.5'
-
-    compile 'com.google.firebase:firebase-ads:9.6.1'
-    testCompile 'junit:junit:4.12'
 }
 
 
