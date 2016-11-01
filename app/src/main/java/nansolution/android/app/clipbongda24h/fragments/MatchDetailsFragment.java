@@ -3,6 +3,7 @@ package nansolution.android.app.clipbongda24h.fragments;
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,7 +34,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MatchDetailsFragment extends Fragment implements View.OnClickListener {
+public class MatchDetailsFragment extends Fragment implements View.OnClickListener, LeagueFragment.CustomAdsListener {
     private static final String MATCH_ID = "MATCHID";
     private String matchId;
     MainActivity mActivity;
@@ -40,6 +42,7 @@ public class MatchDetailsFragment extends Fragment implements View.OnClickListen
     ProgressDialog mProgressDialog;
 
     private final int FIRST_POSITION = 0;
+    private int currentPosition = 0;
 
     private RelativeLayout resultLayout;
     private HTextView resultText;
@@ -52,8 +55,11 @@ public class MatchDetailsFragment extends Fragment implements View.OnClickListen
 
     private String textResult = "";
 
-    private CountDownTimer timer = new CountDownTimer(100000, 500) {
+    private Handler mHandler;
+
+    private CountDownTimer timer = new CountDownTimer(5000, 500) {
         boolean isOn = true;
+        int counter = 5;
         final int sdk = android.os.Build.VERSION.SDK_INT;
         @Override
         public void onFinish() {
@@ -65,6 +71,7 @@ public class MatchDetailsFragment extends Fragment implements View.OnClickListen
         public void onTick(long l) {
             try {
                 if (isOn) {
+                    Log.e("THAIPD", " Counter = " + counter);
                     if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
                         replayButton.setBackgroundDrawable( getResources().getDrawable(R.drawable.bg_replay_btn) );
                     } else {
@@ -72,13 +79,15 @@ public class MatchDetailsFragment extends Fragment implements View.OnClickListen
                     }
                     replayText.setTextColor(getResources().getColor(android.R.color.white));
                     countDownText.setTextColor(getResources().getColor(android.R.color.white));
+                    counter --;
+                    countDownText.setText("" + counter);
                 } else {
                     if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-                        replayButton.setBackgroundDrawable( getResources().getDrawable(R.drawable.bg_replay_btn_on) );
+                        replayButton.setBackgroundDrawable( getResources().getDrawable(R.drawable.bg_replay_btn) );
                     } else {
-                        replayButton.setBackground( getResources().getDrawable(R.drawable.bg_replay_btn_on));
+                        replayButton.setBackground( getResources().getDrawable(R.drawable.bg_replay_btn));
                     }
-                    replayText.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+                    replayText.setTextColor(getResources().getColor(android.R.color.white));
                     countDownText.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
                 }
             } catch (IllegalStateException e) {
@@ -112,12 +121,8 @@ public class MatchDetailsFragment extends Fragment implements View.OnClickListen
         if (getArguments() != null) {
             matchId = getArguments().getString(MATCH_ID);
         }
-        mActivity = (MainActivity) getActivity();
-        mActivity.requestFullScreen(true);
-        // hide toolbar
-        if (mActivity.getSupportActionBar() != null && mActivity.getSupportActionBar().isShowing()) {
-            mActivity.getSupportActionBar().hide();
-        }
+        mHandler = new Handler();
+
     }
 
     @Override
@@ -143,6 +148,8 @@ public class MatchDetailsFragment extends Fragment implements View.OnClickListen
         closeButton.setOnClickListener(this);
         replayButton.setOnClickListener(this);
 
+        mActivity = (MainActivity) getActivity();
+
         loadVideo();
         return view;
     }
@@ -152,12 +159,13 @@ public class MatchDetailsFragment extends Fragment implements View.OnClickListen
         switch (view.getId()) {
             case R.id.closed_button:
                 mActivity.onBackPressed();
+                timer.cancel();
                 break;
             case R.id.replay_layout:
                 timer.cancel();
                 hideResultLayout();
                 if (matchUrls.size() > 1) {
-                    startVideo(matchUrls, FIRST_POSITION);
+                    playMatchVideos(matchUrls, FIRST_POSITION);
                 } else {
                     videoView.seekTo(0);
                     videoView.start();
@@ -179,7 +187,7 @@ public class MatchDetailsFragment extends Fragment implements View.OnClickListen
                     if (response.body().getUrl() != null && response.body().getUrl().size() > 0) {
                         textResult = response.body().getMatchResult();
                         matchUrls = response.body().getUrl();
-                        startVideo(response.body().getUrl(), FIRST_POSITION);
+                        playMatchVideos(response.body().getUrl(), FIRST_POSITION);
                     } else {
                         Toast.makeText(getContext(), "Video is not existing, so sorry...", Toast.LENGTH_LONG).show();
                         getActivity().onBackPressed();
@@ -197,7 +205,7 @@ public class MatchDetailsFragment extends Fragment implements View.OnClickListen
         });
     }
 
-    private void startVideo(final List<String> urls, final int startPosition) {
+    private void playMatchVideos(final List<String> urls, final int startPosition) {
         if (urls.size() <= startPosition) {
             return;
         }
@@ -215,7 +223,7 @@ public class MatchDetailsFragment extends Fragment implements View.OnClickListen
                 if (mProgressDialog.isShowing()) {
                     mProgressDialog.hide();
                 }
-                if (startPosition == FIRST_POSITION && mActivity.isAdLoaded()) {
+                if (startPosition == FIRST_POSITION && mActivity.isAdAvailable()) {
                     mActivity.showAds();
                     videoView.pause();
                 }
@@ -227,16 +235,18 @@ public class MatchDetailsFragment extends Fragment implements View.OnClickListen
             public void onCompletion(MediaPlayer mediaPlayer) {
                 int size = urls.size();
                 if (size - 1 > startPosition) {
-                    startVideo(urls, startPosition + 1);
+                    playMatchVideos(urls, startPosition + 1);
                 } else {
                     showResultLayout();
                     showMatchResult();
+                    mActivity.printStatus();
                 }
             }
         });
         videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
+                mProgressDialog.hide();
                 return false;
             }
         });
@@ -286,15 +296,42 @@ public class MatchDetailsFragment extends Fragment implements View.OnClickListen
     @Override
     public void onPause() {
         super.onPause();
+        currentPosition = videoView.getCurrentPosition();
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        mActivity.requestFullScreen(true);
+        if (currentPosition != 0) {
+            videoView.seekTo(currentPosition);
+            videoView.start();
+        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public void onAdFinished() {
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (!videoView.isPlaying()) {
+                    mActivity = (MainActivity) getActivity();
+                    // hide toolbar
+                    mActivity.requestFullScreen(true);
+                    mHandler.postAtFrontOfQueue(new Runnable() {
+                        @Override
+                        public void run() {
+                            videoView.seekTo(0);
+                            videoView.start();
+                        }
+                    });
+                }
+            }
+        });
     }
 }

@@ -1,6 +1,7 @@
 package nansolution.android.app.clipbongda24h;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -18,19 +19,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.reward.RewardItem;
-import com.google.android.gms.ads.reward.RewardedVideoAd;
-import com.google.android.gms.ads.reward.RewardedVideoAdListener;
+import com.vungle.publisher.EventListener;
+import com.vungle.publisher.VunglePub;
 
 import nansolution.android.app.clipbongda24h.fragments.AllLeaguesFragment;
+import nansolution.android.app.clipbongda24h.fragments.LeagueFragment;
 import nansolution.android.app.clipbongda24h.fragments.MatchDetailsFragment;
 import nansolution.android.app.clipbongda24h.interfaces.ClipBongDaApis;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity implements RewardedVideoAdListener, AppBarLayout.OnOffsetChangedListener {
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
+public class MainActivity extends AppCompatActivity /*implements AppBarLayout.OnOffsetChangedListener */{
 
     final String BASE_URL = "http://123.30.132.164:7070/";
     Retrofit retrofit;
@@ -38,15 +40,19 @@ public class MainActivity extends AppCompatActivity implements RewardedVideoAdLi
     Toolbar toolbar;
     AllLeaguesFragment mainFragment;
 
+    LeagueFragment.CustomAdsListener adsListener;
+    private boolean isAdAvailable = false;
+
     private boolean isWaitingForClose;
 
-    private RewardedVideoAd mAd;
+    final VunglePub vunglePub = VunglePub.getInstance();
+    final String VungleApplicationID = "580a4c1407267fb375000036";
 
     private TextView txtTitle;
 
-    private ImageView ivSearch;
-    private FloatingSearchView floatingSearchView;
-    private AppBarLayout mAppBar;
+//    private ImageView ivSearch;
+//    private FloatingSearchView floatingSearchView;
+//    private AppBarLayout mAppBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,34 +60,36 @@ public class MainActivity extends AppCompatActivity implements RewardedVideoAdLi
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         txtTitle = (TextView) findViewById(R.id.txt_title);
-        ivSearch = (ImageView) findViewById(R.id.iv_search);
-        floatingSearchView = (FloatingSearchView) findViewById(R.id.floating_search_view);
-        floatingSearchView.setVisibility(View.GONE);
+        toolbar.setVisibility(VISIBLE);
+        /*ivSearch = (ImageView) findViewById(R.id.iv_search);
+        floatingSearchView = (FloatingSearchView) findViewById(R.id.floating_search_view);*/
+//        floatingSearchView.setVisibility(GONE);
 
-        mAppBar = (AppBarLayout) findViewById(R.id.appbar);
+        /*mAppBar = (AppBarLayout) findViewById(R.id.appbar);
 
-        mAppBar.addOnOffsetChangedListener(this);
+        mAppBar.addOnOffsetChangedListener(this);*/
 
-        ivSearch.setOnClickListener(new View.OnClickListener() {
+        /*ivSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                ivSearch.setVisibility(View.GONE);
+                ivSearch.setVisibility(View.GONE);
                 floatingSearchView.setVisibility(View.VISIBLE);
                 floatingSearchView.requestFocus();
                 showInputMethod(floatingSearchView);
 
             }
-        });
+        });*/
 
-        floatingSearchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
+        /*floatingSearchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
             @Override
             public void onSearchTextChanged(String oldQuery, String newQuery) {
 
             }
-        });
+        });*/
 
-        setTextTitle(getString(R.string.app_name));
         setSupportActionBar(toolbar);
+        setTextTitle(getString(R.string.app_name));
+//        getSupportActionBar().setHideOnContentScrollEnabled(true);
 
         // build retrofit object
         retrofit = new Retrofit.Builder()
@@ -98,9 +106,40 @@ public class MainActivity extends AppCompatActivity implements RewardedVideoAdLi
         if (AppUtils.isOffline(this)) {
             Toast.makeText(this, "Please check your network and re-open app or pull to refresh", Toast.LENGTH_LONG).show();
         }
-        mAd = MobileAds.getRewardedVideoAdInstance(this);
-        mAd.setRewardedVideoAdListener(this);
-        loadRewardedVideoAd();
+
+        // VungLe Ads
+        vunglePub.init(this, VungleApplicationID);
+        vunglePub.addEventListeners(new EventListener() {
+            @Override
+            public void onAdEnd(boolean b, boolean b1) {
+                Log.v("THAIPD", " Ad Ends");
+                if (adsListener != null) {
+                    Log.i("THAIPD", " start Listener");
+                    adsListener.onAdFinished();
+                }
+            }
+
+            @Override
+            public void onAdStart() {
+                Log.d("THAIPD", " Ad Starts");
+            }
+
+            @Override
+            public void onAdUnavailable(String s) {
+                Log.v("THAIPD", " onAdUnavailable : " + s);
+            }
+
+            @Override
+            public void onAdPlayableChanged(boolean b) {
+                Log.v("THAIPD", " Ad Playable Changed " + b);
+                isAdAvailable = b;
+            }
+
+            @Override
+            public void onVideoView(boolean b, int i, int i1) {
+                Log.i("THAIPD", " OnVideoView " + b + " " + i + "  " + i1);
+            }
+        });
         isWaitingForClose = false;
     }
 
@@ -121,21 +160,23 @@ public class MainActivity extends AppCompatActivity implements RewardedVideoAdLi
         txtTitle.setText(title);
     }
 
-    private void loadRewardedVideoAd() {
-        mAd.loadAd(getString(R.string.ads_id), new AdRequest.Builder().addTestDevice("05FA71BABA44AE8A697393E95A652665").build());
-    }
-
     public void openMatchFragment(String matchId) {
-        MatchDetailsFragment fragment = MatchDetailsFragment.newInstance(matchId);
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.add(R.id.fragmentContainer, fragment);
-        ft.hide(mainFragment);
-        ft.addToBackStack(matchId);
-        ft.commit();
-        requestLandscapeMode();
+            MatchDetailsFragment fragment = MatchDetailsFragment.newInstance(matchId);
+            adsListener = fragment;
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.add(R.id.fragmentContainer, fragment);
+            ft.hide(mainFragment);
+            ft.addToBackStack(matchId);
+            ft.commit();
+            requestLandscapeMode();
     }
 
-    public void backToMainScreen() {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public void showMainScreen() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.show(mainFragment);
     }
@@ -144,21 +185,32 @@ public class MainActivity extends AppCompatActivity implements RewardedVideoAdLi
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
     }
+
     public void requestFullScreen(boolean isFullScreen) {
-        if (isFullScreen) {
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            // hide toolbar
-            if (getSupportActionBar() != null && getSupportActionBar().isShowing()) {
-                getSupportActionBar().hide();
+        try {
+            if (isFullScreen) {
+                // hide toolbar
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+                if (getSupportActionBar() != null && getSupportActionBar().isShowing()) {
+                    Log.d("THAIPD", " HIDE ACTION BAR");
+                    getSupportActionBar().hide();
+
+                }
+
+            } else {
+                Log.v("THAIPD", " REQUEST EXIT FULL SCREEN");
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+                // show toolbar
+                if (getSupportActionBar() != null && !getSupportActionBar().isShowing()) {
+                    getSupportActionBar().show();
+                    Log.d("THAIPD", " SHOW ACTION BAR");
+                }
             }
-        } else {
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-            // show toolbar
-            if (getSupportActionBar() != null && !getSupportActionBar().isShowing()) {
-                getSupportActionBar().show();
-            }
+        } catch (Exception e) {
+            Log.e("THAIPD", e.getMessage());
         }
     }
 
@@ -168,6 +220,7 @@ public class MainActivity extends AppCompatActivity implements RewardedVideoAdLi
     }
 
     public void requestLandscapeMode() {
+        requestFullScreen(true);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
 
@@ -175,64 +228,24 @@ public class MainActivity extends AppCompatActivity implements RewardedVideoAdLi
         return apiService;
     }
 
-    @Override
-    public void onRewardedVideoAdLoaded() {
-        printMessage("onRewardedVideoAdLoaded");
-    }
-
-    @Override
-    public void onRewardedVideoAdOpened() {
-        printMessage("onRewardedVideoAdOpened");
-    }
-
-    @Override
-    public void onRewardedVideoStarted() {
-        printMessage("onRewardedVideoStarted");
-    }
-
-    @Override
-    public void onRewardedVideoAdClosed() {
-        printMessage("onRewardedVideoAdClosed");
-    }
-
-    @Override
-    public void onRewarded(RewardItem rewardItem) {
-        printMessage("onRewarded! currency: ");
-    }
-
-    @Override
-    public void onRewardedVideoAdLeftApplication() {
-        printMessage("onRewardedVideoAdLeftApplication");
-
-    }
-
-    @Override
-    public void onRewardedVideoAdFailedToLoad(int i) {
-        printMessage("onRewardedVideoAdFailedToLoad ");
-    }
-
-    private void printMessage(String message) {
-        Log.d("THAIPD ADS", message);
-    }
-
     public void showAds() {
-        mAd.show();
+        vunglePub.playAd();
     }
 
-    public boolean isAdLoaded() {
-        return mAd.isLoaded();
+    public boolean isAdAvailable() {
+        return isAdAvailable;
     }
 
     @Override
     public void onBackPressed() {
         if (mainFragment.isHidden()) {
-            backToMainScreen();
+            showMainScreen();
             requestPortraitMode();
             super.onBackPressed();
         } else {
-            if (floatingSearchView.getVisibility() == View.VISIBLE) {
-                floatingSearchView.setVisibility(View.GONE);
-            } else if (isWaitingForClose) {
+            /*if (floatingSearchView.getVisibility() == View.VISIBLE) {
+                floatingSearchView.setVisibility(GONE);
+            } else*/ if (isWaitingForClose) {
                 super.onBackPressed();
             } else {
                 isWaitingForClose = true;
@@ -240,7 +253,6 @@ public class MainActivity extends AppCompatActivity implements RewardedVideoAdLi
                 new CountDownTimer(2000, 2000) {
                     @Override
                     public void onTick(long l) {
-
                     }
 
                     @Override
@@ -253,9 +265,24 @@ public class MainActivity extends AppCompatActivity implements RewardedVideoAdLi
 
     }
 
-    @Override
+    /*@Override
     public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-        Log.d("THAIPD", "onOffsetChanged " + verticalOffset);
-        toolbar.setTranslationY(verticalOffset);
+//        toolbar.setTranslationY(verticalOffset);
+    }*/
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        vunglePub.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        vunglePub.onResume();
+    }
+
+    public void printStatus() {
+        Log.v("THAIPD", "ACTIONBAR IS " + getSupportActionBar().isShowing());
     }
 }

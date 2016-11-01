@@ -80,9 +80,8 @@
                 android:layout_alignParentTop="true"
                 android:layout_marginLeft="10dp"
                 android:layout_toRightOf="@id/text_replay"
-                android:text="5"
                 android:textColor="@android:color/white"
-                android:textSize="14dp" />
+                android:textSize="18dp" />
         </RelativeLayout>
 
     </RelativeLayout>

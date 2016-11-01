@@ -107,8 +107,6 @@ public class LeagueFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        getActivity().setRequestedOrientation(
-                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
 
     @Override
@@ -245,5 +243,9 @@ public class LeagueFragment extends Fragment {
                 }
             });
         }
+    }
+
+    public interface CustomAdsListener {
+        void onAdFinished();
     }
 }
