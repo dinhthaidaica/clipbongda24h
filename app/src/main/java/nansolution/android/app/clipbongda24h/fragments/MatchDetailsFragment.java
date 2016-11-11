@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,7 +69,6 @@ public class MatchDetailsFragment extends Fragment implements View.OnClickListen
         public void onTick(long l) {
             try {
                 if (isOn) {
-                    Log.e("THAIPD", " Counter = " + counter);
                     if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
                         replayButton.setBackgroundDrawable( getResources().getDrawable(R.drawable.bg_replay_btn) );
                     } else {

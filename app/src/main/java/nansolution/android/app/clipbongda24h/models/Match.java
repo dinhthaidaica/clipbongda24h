@@ -38,24 +38,8 @@ public class Match {
         return matchResult;
     }
 
-    public void setMatchResult(String matchResult) {
-        this.matchResult = matchResult;
-    }
-
-    public String getPublished() {
-        return published;
-    }
-
     public Float getCreated() {
         return created;
-    }
-
-    public void setCreated(Float created) {
-        this.created = created;
-    }
-
-    public void setPublished(String published) {
-        this.published = published;
     }
 
     public String getId() {
@@ -74,14 +58,6 @@ public class Match {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getImage() {
         return image;
     }
@@ -92,9 +68,5 @@ public class Match {
 
     public List<String> getUrl() {
         return urls;
-    }
-
-    public void setUrl(List<String> url) {
-        this.urls = url;
     }
 }

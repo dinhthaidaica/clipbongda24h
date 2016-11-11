@@ -128,7 +128,6 @@ public class AllLeaguesFragment extends Fragment {
                     new NavigationTabBar.Model.Builder(
                             getResources().getDrawable(resources.get(i)),
                             Color.parseColor(colors[i]))
-                        /*.selectedIcon(getResources().getDrawable(R.mipmap.laliga))*/
                             .build()
             );
         }
@@ -136,7 +135,4 @@ public class AllLeaguesFragment extends Fragment {
         navigationTabBar.setViewPager(viewPager, 0);
     }
 
-    public CustomLeaguesAdapter getAdapter() {
-        return adapter;
-    }
 }

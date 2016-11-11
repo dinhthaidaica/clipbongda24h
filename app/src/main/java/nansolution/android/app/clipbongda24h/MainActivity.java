@@ -30,7 +30,7 @@ import static android.view.View.VISIBLE;
 
 public class MainActivity extends AppCompatActivity {
 
-    final String BASE_URL = "http://123.30.132.164:7070/";
+    final String BASE_URL = "http://pingballclips.com/";
     Retrofit retrofit;
     ClipBongDaApis apiService;
     Toolbar toolbar;
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isWaitingForClose;
 
     final VunglePub vunglePub = VunglePub.getInstance();
-    final String VungleApplicationID = "580a4c1407267fb375000036";
+    final String VungleApplicationID = "yourownid";
 
     private TextView txtTitle;
 

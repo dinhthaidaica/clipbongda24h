@@ -23,6 +23,7 @@ public class AppUtils {
         return false;
     }
 
+    // example to get list of leagues, we should do it by get list from server
     public static List<League> getLeagueData() {
         List<League> list = new ArrayList<>();
         list.add(new League(null, "Home - All matches"));
